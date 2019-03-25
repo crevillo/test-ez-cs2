@@ -1,0 +1,43 @@
+- name: Install PHP libreries
+  command: composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
+  environment:
+    SYMFONY_ENV: "{{ symfony_env }}" 
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+
+- name: Install Front libreries
+  command: yarn install
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+
+- name: Precompile
+  command: "yarn run encore production"
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+
+- name: Detecting database
+  shell: "echo 'show databases;' | mysql -u {{ database_user }} -p{{ database_password }} -h {{ database_host }} | grep {{ database_name }}"
+  register: exists_db_result
+  ignore_errors: yes
+  run_once: true
+
+- name: Create if database not present
+  command: php bin/console doctrine:database:create --env={{shortcut_stages}} --no-interaction
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+  when: exists_db_result|failed
+  run_once: true
+
+- name: Setup if database not present
+  command: php -d memory_limit=-1 bin/console ezplatform:install --env={{shortcut_stages}} clean --no-interaction
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+  when: 
+    - exists_db_result|failed
+  run_once: true  
+
+- name: Run migrations
+  command: php bin/console kaliop:migration:migrate --env={{shortcut_stages}} --no-interaction
+  args:
+    chdir: "{{ ansistrano_release_path.stdout }}"
+  run_once: true

@@ -1,0 +1,4 @@
+stages: staging
+ansistrano_branch: staging
+symfony_env: staging
+shortcut_stages: staging

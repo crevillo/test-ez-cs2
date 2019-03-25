@@ -1,0 +1,9 @@
+- name: Create config folder
+  file: 
+    path={{ ansistrano_deploy_to }}/shared/app/config
+    state=directory
+
+- name: Upload secrets file
+  template:
+    src={{ playbook_dir }}/deploy/templates/secrets.yml.j2
+    dest={{ ansistrano_deploy_to }}/shared/app/config/secrets.yml

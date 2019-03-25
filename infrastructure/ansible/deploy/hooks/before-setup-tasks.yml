@@ -1,0 +1,13 @@
+- name: Send notification message via Slack all options
+  local_action:
+    module: slack
+    token: "{{ slack_token }}"
+    msg: "{{ lookup('env','USER') or lookup('env','USERNAME') }} has started deploying branch {{ ansistrano_git_branch }} of {{ project_name }} to {{ stages }} :rocket:"
+    channel: "{{ slack_channel }}"
+    username: "Deploy"
+    link_names: 0
+    parse: 'none'
+  run_once: true
+  ignore_errors: yes
+  delegate_to: 127.0.0.1
+  sudo: false

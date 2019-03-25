@@ -1,0 +1,27 @@
+---
+- name: Deploy Symfony app
+  hosts: back, front, batch
+  remote_user: deploys
+  any_errors_fatal: true
+  vars:
+    # Ansistrano
+    ansistrano_deploy_to: "/var/www/santander-sam"
+    ansistrano_deploy_via: "git"
+    ansistrano_git_repo: git@bitbucket.org:the-cocktail/santander-sam.git
+    ansistrano_git_branch: "{{ ansistrano_branch }}"
+    ansistrano_allow_anonymous_stats: false
+    ansistrano_shared_paths: ['var/logs', 'vendor', 'node_modules', 'web/assets'] # Shared paths to symlink to release dir
+    ansistrano_shared_files: ['app/config/secrets.yml'] # Shared files to symlink to release dir
+    ansistrano_before_setup_tasks_file: "{{ playbook_dir }}/deploy/hooks/before-setup-tasks.yml"
+    ansistrano_after_setup_tasks_file: "{{ playbook_dir }}/deploy/hooks/after-setup-tasks.yml"
+    ansistrano_before_symlink_tasks_file: "{{ playbook_dir }}/deploy/hooks/before-symlink-tasks.yml"
+    ansistrano_after_symlink_tasks_file: "{{ playbook_dir }}/deploy/hooks/after-symlink-tasks.yml"
+    ansistrano_after_cleanup_tasks_file: "{{ playbook_dir }}/deploy/hooks/after-cleanup-tasks.yml"
+    ansistrano_keep_releases: 6
+    # Custom tasks
+    project_name: "santander-sam"
+    slack_channel: "#santander-sam"
+  vars_files:
+    - "{{ playbook_dir }}/deploy/vars/{{stages}}_secrets.yml"
+  roles:
+    - { role: carlosbuenosvinos.ansistrano-deploy }

@@ -1,0 +1,17 @@
+- name: Restart fpm service
+  command: sudo service php7.2-fpm restart
+  when: "'back' in group_names"
+
+- name: Send notification message via Slack all options
+  local_action:
+    module: slack
+    token: "{{ slack_token }}"
+    msg: "{{ lookup('env','USER') or lookup('env','USERNAME') }} has finished deploying branch {{ ansistrano_git_branch }} of {{ project_name }} to {{ stages }} :beers:"
+    channel: "{{ slack_channel }}"
+    username: "Deploy"
+    link_names: 0
+    parse: 'none'
+  run_once: true
+  ignore_errors: yes
+  delegate_to: 127.0.0.1
+  sudo: false

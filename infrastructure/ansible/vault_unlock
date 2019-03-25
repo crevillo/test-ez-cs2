@@ -1,0 +1,6 @@
+#!/bin/bash
+
+s3cmd get s3://santander-setup/ansible_vault_key /tmp/ansible_vault_key > /dev/null 2> /dev/null --region=eu-central-1 --force
+cat /tmp/ansible_vault_key
+rm /tmp/ansible_vault_key
+
