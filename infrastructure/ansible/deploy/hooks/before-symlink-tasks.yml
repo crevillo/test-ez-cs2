@@ -1,7 +1,7 @@
 - name: Install PHP libreries
   command: composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
   environment:
-    SYMFONY_ENV: "{{ symfony_env }}" 
+    SYMFONY_ENV: "prod"
   args:
     chdir: "{{ ansistrano_release_path.stdout }}"
 
